@@ -2,8 +2,8 @@ import "dotenv/config";
 import { Hono } from "hono";
 import { prettyJSON } from "hono/pretty-json";
 import { cors } from "hono/cors";
-import { routes } from "./routes/index.js";
 import { serve } from "@hono/node-server";
+import { user } from "./routes/user.ts";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not defined in the environment variables.");
@@ -21,7 +21,8 @@ app.use(
 );
 
 app.use("*", prettyJSON());
-app.route("/", routes);
+app.route('/',user);
+
 
 serve(app);
 

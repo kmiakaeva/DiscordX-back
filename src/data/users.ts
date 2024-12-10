@@ -1,6 +1,6 @@
 import type { usersTable } from "../db/schema.ts";
 
-type User = Omit<typeof usersTable.$inferSelect, "id">;
+export type User = Omit<typeof usersTable.$inferSelect, "id">;
 
 export const users: User[] = [
   {
