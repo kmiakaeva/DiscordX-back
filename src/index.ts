@@ -16,13 +16,12 @@ app.use(
   "*",
   cors({
     origin: "http://localhost:5173",
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
 );
 
 app.use("*", prettyJSON());
-app.route('/',user);
-
+app.route("/", user);
 
 serve(app);
 
