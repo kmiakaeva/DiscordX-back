@@ -1,7 +1,7 @@
 import { usersTable } from "../db/schema.ts";
 import { eq } from "drizzle-orm";
 import { db } from "../database.ts";
-import type { User } from "../data/users.ts";
+import type { User } from "../db/types.ts";
 
 export async function getUserById(id: number) {
   try {

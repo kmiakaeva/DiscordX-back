@@ -1,8 +1,8 @@
-import { users, type User } from "../data/users.ts";
+import { type User } from "../db/types.ts";
 import { db } from "../database.ts";
 import { usersTable } from "../db/schema.ts";
 
-export async function addUsersToDB() {
+export async function addUsersToDB(users: User[]) {
   try {
     const result = await db.insert(usersTable).values(users).returning();
     return result;
@@ -12,7 +12,6 @@ export async function addUsersToDB() {
     }
   }
 }
-
 
 export async function addUserToDB(user: User) {
   try {

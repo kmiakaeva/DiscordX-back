@@ -1,33 +1,32 @@
 import { Hono } from "hono";
+import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 import { addUserToDB } from "../repository/user.ts";
-import type { User } from "../data/users.ts";
 import { getUserById, updateUserById } from "../services/user.ts";
+import type { UserFormData } from "../db/types.ts";
 
 export const user = new Hono().basePath("/users");
 
 user.get("/", (c) => c.json("DiscordX Users API", 200));
 
-// fetch('localhost:8000/users', {
-//   method: 'POST',
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-//   body: JSON.stringify({
-//     name: 'John Doe',
-//     username: 'johndoe',
-//     status: 'online',
-//     avatarImage: 'https://robohash.org/johndoe?set=set1&size=200x200',
-//     customStatus: 'Hello, world!',
-//   }),
-// })
-// .then((response) => response.json())
-// .then((data) => console.log(data))
-// .catch((error) => console.error(error));
-
 user.post("/", async (c) => {
   try {
-    const user = await c.req.json<User>();
-    const result = await addUserToDB(user);
+    const user = await c.req.json<UserFormData>();
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    const randomUsername = `${user.name
+      .toLowerCase()
+      .replace(/\s+/g, "_")}_${uuidv4()}`;
+
+    const result = await addUserToDB({
+      name: user.name,
+      email: user.email,
+      username: randomUsername,
+      password: hashedPassword,
+      status: "online",
+      avatarImage: "",
+      customStatus: "",
+    });
+
     return c.json({ message: "User added successfully", result }, 201);
   } catch (error: any) {
     if (error instanceof Error) {

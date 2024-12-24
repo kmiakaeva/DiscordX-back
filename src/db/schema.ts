@@ -10,8 +10,10 @@ export const userStatusEnum = pgEnum("user_status", [
 export const usersTable = pgTable("users", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   name: varchar("name", { length: 50 }).notNull(),
-  username: varchar("username", { length: 25 }).notNull().unique(),
+  email: varchar("email", { length: 100 }).notNull().unique(),
+  username: varchar("username").notNull().unique(),
+  password: varchar("password").notNull(),
   status: userStatusEnum("status").notNull().default("online"),
-  avatarImage: varchar("avatarImage").notNull().unique(),
-  customStatus: varchar("customStatus", { length: 255 }),
+  avatarImage: varchar("avatarImage").notNull(),
+  customStatus: varchar("customStatus", { length: 100 }),
 });
