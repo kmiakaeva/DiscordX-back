@@ -1,25 +1,40 @@
 import { Hono } from "hono";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
+
+import { db } from "../database.ts";
+import { usersTable } from "../db/schema.ts";
 import { addUserToDB } from "../repository/user.ts";
 import { getUserById, updateUserById } from "../services/user.ts";
-import type { UserFormData } from "../db/types.ts";
+import { registerValidator } from "../services/validation/user.schema.ts";
 
 export const user = new Hono().basePath("/users");
 
 user.get("/", (c) => c.json("DiscordX Users API", 200));
 
-user.post("/", async (c) => {
+user.post("/", registerValidator, async (c) => {
   try {
-    const user = await c.req.json<UserFormData>();
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    const randomUsername = `${user.name
+    const { name, email, password } = c.req.valid("json");
+
+    const existingUser = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      throw new Error("Пользователь с таким email уже зарегистрирован");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const randomUsername = `${name
       .toLowerCase()
       .replace(/\s+/g, "_")}_${uuidv4()}`;
 
     const result = await addUserToDB({
-      name: user.name,
-      email: user.email,
+      name,
+      email,
       username: randomUsername,
       password: hashedPassword,
       status: "online",
@@ -28,7 +43,7 @@ user.post("/", async (c) => {
     });
 
     return c.json({ message: "User added successfully", result }, 201);
-  } catch (error: any) {
+  } catch (error) {
     if (error instanceof Error) {
       return c.json(
         { message: "Error adding users", error: error.message },
