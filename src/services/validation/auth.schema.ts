@@ -38,3 +38,16 @@ export const registerSchema = z.object({
 });
 
 export const registerValidator = zValidator("json", registerSchema);
+
+export const signinSchema = z.object({
+  email: z
+    .string()
+    .email(errorMessages.email.invalid)
+    .min(1, errorMessages.email.required),
+  password: z
+    .string()
+    .min(6, errorMessages.password.min)
+    .max(50, errorMessages.password.max),
+});
+
+export const signinValidator = zValidator("json", signinSchema);
