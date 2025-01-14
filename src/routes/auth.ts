@@ -78,7 +78,10 @@ auth.post("/signin", signinValidator, async (c) => {
       .limit(1);
 
     if (result.length === 0) {
-      return c.json({ message: "Такого пользователя не существует" }, 404);
+      return c.json(
+        { message: "Пользователя с таким email не существует" },
+        404
+      );
     }
 
     const user = result[0];
